@@ -16,7 +16,7 @@ namespace CondoLounge.Data.Repositories
 
         public List<ApplicationUser> AllUsers(int buildingId)
         {
-            IEnumerable<Condo> condos = _dbSet.Where(b => b.Id == buildingId).Select(b => b.Condos).ToList();
+            return _dbSet.Where(b => b.Id == buildingId).Select(b => b.Condos).Select(c => c.Users).ToList();
         }
     }
 }
