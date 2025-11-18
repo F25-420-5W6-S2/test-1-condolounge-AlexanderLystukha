@@ -1,5 +1,4 @@
-﻿using CondoLounge.Data;
-using CondoLounge.Data.Entities;
+﻿using CondoLounge.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Text.Json;
 
@@ -12,9 +11,9 @@ namespace CondoLounge.Data
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole<int>> _roleManager;
 
-        public CondoLoungeSeeder(ApplicationDbContext context, 
-                IWebHostEnvironment hosting, 
-                UserManager<ApplicationUser> userManager, 
+        public CondoLoungeSeeder(ApplicationDbContext context,
+                IWebHostEnvironment hosting,
+                UserManager<ApplicationUser> userManager,
                 RoleManager<IdentityRole<int>> roleManager)
         {
             _db = context;
@@ -27,49 +26,60 @@ namespace CondoLounge.Data
         {
             //Verify that the database exists. Hover over the method and read the documentation. 
             _db.Database.EnsureCreated();
-                        
-            if (!_roleManager.Roles.Any()) {
+
+            if (!_roleManager.Roles.Any())
+            {
                 await _roleManager.CreateAsync(new IdentityRole<int>("Admin"));
                 await _roleManager.CreateAsync(new IdentityRole<int>("Normal"));
             }
 
-            if (!_userManager.Users.Any())
-            {                
-                var user = new ApplicationUser() { UserName = "admin@email.com", Email = "admin@email.com",
-                    Buildings = new List<Building>() 
-                    {
-                        new Building()
+            //If there are no products then create the sample data from art.json
+            if (!_db.Buildings.Any())
+            {
+                var building = new Building()
+                {
+                    Condos = new List<Condo>() {
+                        new Condo()
                         {
-                            Condos = new List<Condo>()
-                            {
-                                new Condo()
-                                {
-                                    Condo_Number = 1,
-                                    Address = "NYC"
-                                }
-                            }
+                            Condo_Number = 1,
+                            Address = "NYC"
                         }
-                    } 
-                };                
-                await _userManager.CreateAsync(user, "VerySecureAdmin45%");  
+                    }
+                };
+
+
+                _db.Buildings.Add(building);
+
+                //ContentRootPath is refering to the folders not related to wwwroot
+                var file = Path.Combine(_hosting.ContentRootPath, "Data/art.json");
+                var json = File.ReadAllText(file);
+
+                //Deserialise the json file into the List of Product class
+                var buildings = JsonSerializer.Deserialize<IEnumerable<Building>>(json);
+
+                //Add the new list of products to the database
+                _db.Buildings.AddRange(buildings);
+
+                _db.SaveChanges();  //commit changes to the database (make permanent) 
+            }
+
+
+            if (!_userManager.Users.Any())
+            {
+                var user = new ApplicationUser()
+                {
+                    UserName = "admin@email.com",
+                    Email = "admin@email.com",
+                    Buildings = new List<Building>()
+                    {
+                        _db.Buildings.First()
+                    }
+                };
+                await _userManager.CreateAsync(user, "VerySecureAdmin45%");
                 await _userManager.AddToRoleAsync(user, "Admin");
             }
 
-            ////If there are no products then create the sample data from art.json
-            //if (!_db.Buildings.Any())
-            //{
-            //    //ContentRootPath is refering to the folders not related to wwwroot
-            //    var file = Path.Combine(_hosting.ContentRootPath, "Data/art.json");
-            //    var json = File.ReadAllText(file);
 
-            //    //Deserialise the json file into the List of Product class
-            //    var buildings = JsonSerializer.Deserialize<IEnumerable<Building>>(json);
-
-            //    //Add the new list of products to the database
-            //    _db.Buildings.AddRange(buildings);
-
-            //    _db.SaveChanges();  //commit changes to the database (make permanent) 
-            //}
         }
     }
 }
