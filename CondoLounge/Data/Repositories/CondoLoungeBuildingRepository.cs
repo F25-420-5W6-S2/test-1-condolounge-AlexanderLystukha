@@ -9,14 +9,14 @@ namespace CondoLounge.Data.Repositories
         {
         }
 
-        public List<Condo> AllCondos(int buildingId)
-        {
-            return _dbSet.Where(b => b.Id == buildingId).Select(b => b.Condos).ToList();
-        }
+        //public List<Condo> AllCondos(int buildingId)
+        //{
+        //    return _dbSet.Where(b => b.Id == buildingId).Select(b => b.Condos).ToList();
+        //}
 
-        public List<ApplicationUser> AllUsers(int buildingId)
-        {
-            return _dbSet.Where(b => b.Id == buildingId).Select(b => b.Condos).Select(c => c.Users).ToList();
-        }
+        //public List<ApplicationUser> AllUsers(int buildingId)
+        //{
+        //    return _dbSet.Where(b => b.Id == buildingId).Select(b => b.Condos).Select(c => c.Users).ToList();
+        //}
     }
 }
