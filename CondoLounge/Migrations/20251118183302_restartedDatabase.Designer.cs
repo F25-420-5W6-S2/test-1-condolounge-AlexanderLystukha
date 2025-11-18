@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CondoLounge.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251118171431_init")]
-    partial class init
+    [Migration("20251118183302_restartedDatabase")]
+    partial class restartedDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,13 +27,13 @@ namespace CondoLounge.Migrations
 
             modelBuilder.Entity("ApplicationUserCondo", b =>
                 {
-                    b.Property<int>("CondosCondo_Number")
+                    b.Property<int>("CondosId")
                         .HasColumnType("int");
 
                     b.Property<int>("UsersId")
                         .HasColumnType("int");
 
-                    b.HasKey("CondosCondo_Number", "UsersId");
+                    b.HasKey("CondosId", "UsersId");
 
                     b.HasIndex("UsersId");
 
@@ -123,29 +123,32 @@ namespace CondoLounge.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Building");
+                    b.ToTable("Buildings");
                 });
 
             modelBuilder.Entity("CondoLounge.Data.Entities.Condo", b =>
                 {
-                    b.Property<int>("Condo_Number")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Condo_Number"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("BuildingId")
+                    b.Property<int>("BuildingId")
                         .HasColumnType("int");
 
-                    b.HasKey("Condo_Number");
+                    b.Property<int>("Condo_Number")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("BuildingId");
 
-                    b.ToTable("Condo");
+                    b.ToTable("Condos");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<int>", b =>
@@ -285,7 +288,7 @@ namespace CondoLounge.Migrations
                 {
                     b.HasOne("CondoLounge.Data.Entities.Condo", null)
                         .WithMany()
-                        .HasForeignKey("CondosCondo_Number")
+                        .HasForeignKey("CondosId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -305,9 +308,13 @@ namespace CondoLounge.Migrations
 
             modelBuilder.Entity("CondoLounge.Data.Entities.Condo", b =>
                 {
-                    b.HasOne("CondoLounge.Data.Entities.Building", null)
+                    b.HasOne("CondoLounge.Data.Entities.Building", "Building")
                         .WithMany("Condos")
-                        .HasForeignKey("BuildingId");
+                        .HasForeignKey("BuildingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Building");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>

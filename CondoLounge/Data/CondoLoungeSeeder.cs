@@ -50,16 +50,6 @@ namespace CondoLounge.Data
 
                 _db.Buildings.Add(building);
 
-                //ContentRootPath is refering to the folders not related to wwwroot
-                var file = Path.Combine(_hosting.ContentRootPath, "Data/art.json");
-                var json = File.ReadAllText(file);
-
-                //Deserialise the json file into the List of Product class
-                var buildings = JsonSerializer.Deserialize<IEnumerable<Building>>(json);
-
-                //Add the new list of products to the database
-                _db.Buildings.AddRange(buildings);
-
                 _db.SaveChanges();  //commit changes to the database (make permanent) 
             }
 
@@ -73,6 +63,10 @@ namespace CondoLounge.Data
                     Buildings = new List<Building>()
                     {
                         _db.Buildings.First()
+                    },
+                    Condos = new List<Condo>()
+                    {
+                        _db.Condos.First()
                     }
                 };
                 await _userManager.CreateAsync(user, "VerySecureAdmin45%");
