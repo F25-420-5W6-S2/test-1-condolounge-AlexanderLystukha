@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using CondoLounge.Data;
 
 namespace CondoLounge.Areas.Identity.Pages.Account
 {
@@ -30,13 +31,14 @@ namespace CondoLounge.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly UnitOfWork _unitOfWork;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender, UnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +46,7 @@ namespace CondoLounge.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -82,11 +85,11 @@ namespace CondoLounge.Areas.Identity.Pages.Account
 
             [Required]
             [Display(Name = "Building")]
-            public List<Building> Building { get; set; }
+            public int Building { get; set; }
 
             [Required]
             [Display(Name = "Condo")]
-            public List<Condo> Condo { get; set; }
+            public int Condo { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -122,8 +125,12 @@ namespace CondoLounge.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-                user.Buildings = Input.Building;
-                user.Condos = Input.Condo;
+
+
+
+
+                user.Buildings.Add(new Building() { Id = Input.Building });
+                user.Condos.Add(new Condo() { Id = Input.Condo });
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
