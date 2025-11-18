@@ -126,7 +126,10 @@ namespace CondoLounge.Areas.Identity.Pages.Account
             {
                 var user = CreateUser();
 
-
+                /*
+                 * Using the repository method, I would check if the building id is valid and then
+                 * get that building and add it to the list of building/condos for the user.
+                 */
 
 
                 user.Buildings.Add(new Building() { Id = Input.Building });
